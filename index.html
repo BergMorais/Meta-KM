@@ -3,10 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mission Gate</title>
+    <title>Mission Gate (Carrossel com Setas)</title>
     <link rel="icon" href="https://lucide.dev/icons/target.svg" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
       :root {
         --bg: #f5f7fb;
@@ -16,7 +21,6 @@
         --accent-light: #e6f0ff;
         --shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
       }
-
       body.dark {
         --bg: #101010;
         --card: #1c1c1c;
@@ -54,20 +58,19 @@
       }
 
       .dark-toggle {
-        position: fixed;
         top: 15px;
         right: 15px;
-        background: var(--card);
         border: none;
         padding: 10px 12px;
         border-radius: 50px;
         cursor: pointer;
         box-shadow: var(--shadow);
+        background: var(--card);
+        color: var(--text);
         transition: background 0.3s, color 0.3s;
         display: flex;
         align-items: center;
         gap: 5px;
-        width: 15%;
       }
 
       .card {
@@ -78,20 +81,14 @@
         width: 100%;
         max-width: 420px;
         margin-bottom: 20px;
-        transition: background 0.3s, color 0.3s, box-shadow 0.3s;
-      }
-
-      label {
-        display: block;
-        margin-top: 10px;
-        font-weight: 600;
+        position: relative;
       }
 
       input,
       select {
         width: 100%;
         padding: 10px;
-        margin-top: 4px;
+        margin-top: 6px;
         border-radius: 10px;
         border: 1px solid #ccc;
         background: var(--accent-light);
@@ -110,27 +107,28 @@
         font-weight: bold;
         cursor: pointer;
         transition: 0.3s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
       }
 
       button:hover {
         opacity: 0.9;
       }
 
-      /* === Carrossel === */
       .carrossel-container {
         position: relative;
         overflow: hidden;
-        border-radius: 16px;
       }
 
       .carrossel {
         display: flex;
-        gap: 10px;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
-        scroll-behavior: smooth;
+        gap: 10px;
         padding-bottom: 10px;
-        transition: all 0.3s ease;
+        scroll-behavior: smooth;
       }
 
       .carrossel::-webkit-scrollbar {
@@ -140,54 +138,65 @@
       .mission-card {
         scroll-snap-align: center;
         min-width: 280px;
-        flex: 0 0 auto;
         background: var(--accent-light);
         border-radius: 14px;
         padding: 15px;
-        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        transition: all 0.3s ease;
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
-        justify-content: space-between;
-        transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s,
-          box-shadow 0.3s;
+        align-items: center;
       }
 
       .mission-card.completed {
-        opacity: 0.6;
-        text-decoration: line-through;
+        background: linear-gradient(135deg, #ff6b6b, #ff2e63);
+        color: #fff;
       }
 
-      .mission-card span {
-        font-size: 1rem;
-        font-weight: 600;
-      }
-
-      .mission-card input {
-        transform: scale(1.3);
+      .mission-card button {
+        width: auto;
+        background: var(--accent);
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-size: 0.9rem;
         margin-top: 10px;
       }
 
-      .mission-count {
-        text-align: center;
-        font-size: 1rem;
-        margin: 10px 0;
-        font-weight: 600;
+      .mission-card.completed button {
+        background: #fff;
+        color: #ff2e63;
       }
 
-      .summary {
-        text-align: center;
-        font-size: 1.1rem;
-        margin-bottom: 10px;
+      .carrossel-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--card);
+        box-shadow: var(--shadow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 5;
       }
 
-      /* === Progress Bar === */
+      .carrossel-nav.left {
+        left: -10px;
+      }
+
+      .carrossel-nav.right {
+        right: -10px;
+      }
+
       .progress-bar {
         background: #ccc;
         border-radius: 10px;
         height: 12px;
         width: 100%;
-        margin-bottom: 15px;
+        margin-bottom: 8px;
         overflow: hidden;
       }
 
@@ -198,45 +207,19 @@
         transition: width 0.5s ease;
       }
 
-      /* === Navegação Carrossel === */
-      .carrossel-nav {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: var(--card);
-        box-shadow: var(--shadow);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 10;
-      }
-
-      .carrossel-nav.left {
-        left: 5px;
-      }
-      .carrossel-nav.right {
-        right: 5px;
-      }
-
       canvas {
         width: 100% !important;
         max-height: 300px;
       }
 
       @media (min-width: 768px) {
-        h1 {
-          font-size: 2rem;
-        }
         .mission-card {
-          min-width: 300px;
+          min-width: 320px;
         }
       }
     </style>
   </head>
+
   <body>
     <button class="dark-toggle" id="toggleDark">
       <i data-lucide="moon"></i> Dark Mode
@@ -258,251 +241,228 @@
       <button id="gerarBtn">
         <i data-lucide="list-checks"></i> Gerar Missões
       </button>
+      <button id="resetarBtn" style="background: #ff5555">
+        <i data-lucide="trash-2"></i> Resetar Tudo
+      </button>
     </div>
 
-    <div class="card" style="position: relative">
+    <div class="card">
       <h2><i data-lucide="flag"></i> Missões do Dia</h2>
       <div class="progress-bar">
         <div class="progress-fill" id="progressFill"></div>
       </div>
-      <div class="mission-count" id="contadorMissoes">
-        0 concluídas • 0 pendentes
-      </div>
-
-      <div class="carrossel-nav left" id="prevBtn">
-        <i data-lucide="chevron-left"></i>
-      </div>
-      <div class="carrossel-nav right" id="nextBtn">
-        <i data-lucide="chevron-right"></i>
-      </div>
+      <div id="motivacaoTexto">Vamos começar sua jornada!</div>
+      <div id="contadorMissoes">0 concluídas • 0 pendentes</div>
 
       <div class="carrossel-container">
+        <div class="carrossel-nav left" id="prevBtn">
+          <i data-lucide="chevron-left"></i>
+        </div>
+        <div class="carrossel-nav right" id="nextBtn">
+          <i data-lucide="chevron-right"></i>
+        </div>
+
         <div class="carrossel" id="listaMissoes"></div>
       </div>
     </div>
 
     <div class="card">
       <h2><i data-lucide="bar-chart-2"></i> Resumo</h2>
-      <p class="summary" id="resumoTexto">Nenhuma missão concluída ainda.</p>
+      <p id="resumoTexto">Nenhuma missão concluída ainda.</p>
       <canvas id="grafico"></canvas>
     </div>
 
     <script>
       lucide.createIcons();
-
       const metaInput = document.getElementById("metaValor");
       const valorKmInput = document.getElementById("valorKm");
       const tipoVariedade = document.getElementById("tipoVariedade");
       const gerarBtn = document.getElementById("gerarBtn");
+      const resetarBtn = document.getElementById("resetarBtn");
       const listaMissoes = document.getElementById("listaMissoes");
       const resumoTexto = document.getElementById("resumoTexto");
       const contadorMissoes = document.getElementById("contadorMissoes");
       const progressFill = document.getElementById("progressFill");
+      const motivacaoTexto = document.getElementById("motivacaoTexto");
+      const toggleDark = document.getElementById("toggleDark");
       const prevBtn = document.getElementById("prevBtn");
       const nextBtn = document.getElementById("nextBtn");
-      const toggleDark = document.getElementById("toggleDark");
 
       let missoes = [];
       let totalGanho = 0;
       let chart;
 
-      // === Dark Mode toggle ===
-      window.onload = () => {
-        const dark = localStorage.getItem("darkMode");
-        if (dark === "true") {
-          document.body.classList.add("dark");
-        }
-        atualizarToggleIcon();
-      };
-
+      // === DARK MODE ===
+      const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+      if (
+        localStorage.getItem("darkMode") === "true" ||
+        (!localStorage.getItem("darkMode") && prefersDark)
+      ) {
+        document.body.classList.add("dark");
+      }
+      atualizarToggle();
       toggleDark.addEventListener("click", () => {
         document.body.classList.toggle("dark");
-        const darkOn = document.body.classList.contains("dark");
-        localStorage.setItem("darkMode", darkOn);
-        atualizarToggleIcon();
+        localStorage.setItem(
+          "darkMode",
+          document.body.classList.contains("dark")
+        );
+        atualizarToggle();
       });
-
-      function atualizarToggleIcon() {
-        const icon = toggleDark.querySelector("i");
-        if (document.body.classList.contains("dark")) {
-          icon.setAttribute("data-lucide", "sun");
-          toggleDark.innerHTML = `<i data-lucide="sun"></i> Light Mode`;
-        } else {
-          icon.setAttribute("data-lucide", "moon");
-          toggleDark.innerHTML = `<i data-lucide="moon"></i> Dark Mode`;
-        }
+      function atualizarToggle() {
+        toggleDark.innerHTML = document.body.classList.contains("dark")
+          ? '<i data-lucide="sun"></i> Light Mode'
+          : '<i data-lucide="moon"></i> Dark Mode';
         lucide.createIcons();
       }
 
-      // === LocalStorage Missões ===
-      const dadosSalvos = JSON.parse(localStorage.getItem("missoesIKP"));
+      // === LOCAL STORAGE ===
+      const dadosSalvos = JSON.parse(localStorage.getItem("missoesData"));
       if (dadosSalvos) {
         missoes = dadosSalvos.missoes;
-        metaInput.value = dadosSalvos.meta || "";
-        valorKmInput.value = dadosSalvos.valorKm || "";
-        tipoVariedade.value = dadosSalvos.tipo || "suave";
+        metaInput.value = dadosSalvos.meta;
+        valorKmInput.value = dadosSalvos.valorKm;
+        tipoVariedade.value = dadosSalvos.tipo;
         renderMissoes();
         atualizarResumo();
       }
 
-      // === Funções principais ===
+      // === GERAR MISSÕES ===
       gerarBtn.addEventListener("click", () => {
-        gerarMissoes();
-        salvarLocalStorage();
-      });
-
-      function gerarMissoes() {
         const meta = parseFloat(metaInput.value);
         const valorKm = parseFloat(valorKmInput.value);
         const tipo = tipoVariedade.value;
-        if (isNaN(meta) || isNaN(valorKm) || meta <= 0 || valorKm <= 0) {
-          alert("Valores inválidos!");
-          return;
-        }
+        if (!meta || !valorKm || meta <= 0 || valorKm <= 0)
+          return alert("Valores inválidos!");
         missoes = [];
         let soma = 0;
         const minKm = tipo === "suave" ? 3 : 2;
         const maxKm = tipo === "suave" ? 10 : 20;
-        while (soma < meta) {
-          const km = parseFloat(
-            (Math.random() * (maxKm - minKm) + minKm).toFixed(1)
-          );
-          const valor = parseFloat((km * valorKm).toFixed(2));
+        while (soma < meta && missoes.length < 100) {
+          const km = +(Math.random() * (maxKm - minKm) + minKm).toFixed(1);
+          const valor = +(km * valorKm).toFixed(2);
           missoes.push({ km, valor, done: false });
           soma += valor;
         }
+        salvar();
         renderMissoes();
         atualizarResumo();
-      }
+      });
 
+      // === RESET ===
+      resetarBtn.addEventListener("click", () => {
+        if (confirm("Deseja realmente apagar tudo?")) {
+          missoes = [];
+          localStorage.removeItem("missoesData");
+          renderMissoes();
+          atualizarResumo();
+        }
+      });
+
+      // === RENDERIZAÇÃO ===
       function renderMissoes() {
         listaMissoes.innerHTML = "";
         missoes.forEach((m, i) => {
           const div = document.createElement("div");
           div.className = "mission-card" + (m.done ? " completed" : "");
-          div.innerHTML = `<span>${m.km} km • R$ ${m.valor.toFixed(2)}</span>
-    <label><input type="checkbox" ${
-      m.done ? "checked" : ""
-    } onchange="toggleMissao(${i})"> Concluir</label>`;
+          div.innerHTML = `
+            <div><i data-lucide="route"></i> ${m.km} km</div>
+            <div><i data-lucide="wallet"></i> R$ ${m.valor.toFixed(2)}</div>
+            <button><i data-lucide="${m.done ? "rotate-ccw" : "check"}"></i> ${
+            m.done ? "Desfazer" : "Concluir"
+          }</button>
+          `;
+          div
+            .querySelector("button")
+            .addEventListener("click", () => toggleMissao(i));
           listaMissoes.appendChild(div);
         });
+        lucide.createIcons();
         atualizarContador();
-        atualizarProgressBar();
-        atualizarZoomCarrossel();
       }
 
-      function toggleMissao(index) {
-        missoes[index].done = !missoes[index].done;
+      function toggleMissao(i) {
+        missoes[i].done = !missoes[i].done;
+        salvar();
         renderMissoes();
         atualizarResumo();
-        salvarLocalStorage();
       }
 
       function atualizarContador() {
         const concluidas = missoes.filter((m) => m.done).length;
-        const pendentes = missoes.length - concluidas;
-        contadorMissoes.textContent = `${concluidas} concluídas • ${pendentes} pendentes`;
+        contadorMissoes.textContent = `${concluidas} concluídas • ${
+          missoes.length - concluidas
+        } pendentes`;
       }
 
       function atualizarResumo() {
         totalGanho = missoes
           .filter((m) => m.done)
-          .reduce((acc, m) => acc + m.valor, 0);
-        resumoTexto.textContent = `Total ganho: R$ ${totalGanho.toFixed(
-          2
-        )} de R$ ${metaInput.value || 0}`;
-        atualizarGrafico();
-        atualizarContador();
-        atualizarProgressBar();
-      }
-
-      function atualizarProgressBar() {
+          .reduce((a, b) => a + b.valor, 0);
         const meta = parseFloat(metaInput.value) || 0;
-        const percent = meta > 0 ? Math.min((totalGanho / meta) * 100, 100) : 0;
+        resumoTexto.textContent = meta
+          ? `Total ganho: R$ ${totalGanho.toFixed(2)} de R$ ${meta}`
+          : "Nenhuma missão concluída ainda.";
+        atualizarProgress(meta);
+        atualizarGrafico(meta);
+      }
+
+      function atualizarProgress(meta) {
+        const percent = meta ? Math.min((totalGanho / meta) * 100, 100) : 0;
         progressFill.style.width = percent + "%";
+        let msg = "Vamos começar sua jornada!";
+        if (percent >= 10 && percent < 30)
+          msg = "Bom começo! Continue acelerando! 🏁";
+        else if (percent >= 30 && percent < 60)
+          msg = "Você está pegando o ritmo! 🚀";
+        else if (percent >= 60 && percent < 90)
+          msg = "Incrível! Falta pouco! 💪";
+        else if (percent >= 90 && percent < 100) msg = "Quase lá! 🔥";
+        else if (percent >= 100) msg = "Meta alcançada! 🏆";
+        motivacaoTexto.textContent = msg;
       }
 
-      function atualizarGrafico() {
+      function atualizarGrafico(meta) {
         const ctx = document.getElementById("grafico").getContext("2d");
-        const valores = [
-          totalGanho,
-          Math.max(0, parseFloat(metaInput.value || 0) - totalGanho),
-        ];
-        const cores = ["#4da3ff", "#ccc"];
-        if (chart) chart.destroy();
-        chart = new Chart(ctx, {
-          type: "doughnut",
-          data: {
-            labels: ["Concluído", "Restante"],
-            datasets: [{ data: valores, backgroundColor: cores }],
-          },
-          options: { plugins: { legend: { position: "bottom" } } },
-        });
+        const valores = [totalGanho, Math.max(0, meta - totalGanho)];
+        if (!chart) {
+          chart = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+              labels: ["Concluído", "Restante"],
+              datasets: [
+                { data: valores, backgroundColor: ["#4da3ff", "#ccc"] },
+              ],
+            },
+            options: { plugins: { legend: { position: "bottom" } } },
+          });
+        } else {
+          chart.data.datasets[0].data = valores;
+          chart.update();
+        }
       }
 
-      function salvarLocalStorage() {
-        const dados = {
-          missoes,
-          meta: metaInput.value,
-          valorKm: valorKmInput.value,
-          tipo: tipoVariedade.value,
-        };
-        localStorage.setItem("missoesIKP", JSON.stringify(dados));
+      function salvar() {
+        localStorage.setItem(
+          "missoesData",
+          JSON.stringify({
+            missoes,
+            meta: metaInput.value,
+            valorKm: valorKmInput.value,
+            tipo: tipoVariedade.value,
+          })
+        );
       }
 
-      // === Navegação Carrossel ===
+      // === CARROSSEL NAVEGAÇÃO ===
       prevBtn.addEventListener("click", () => {
         listaMissoes.scrollBy({ left: -300, behavior: "smooth" });
       });
       nextBtn.addEventListener("click", () => {
         listaMissoes.scrollBy({ left: 300, behavior: "smooth" });
       });
-
-      // === Swipe Touch ===
-      let isDown = false,
-        startX,
-        scrollLeft;
-      listaMissoes.addEventListener("mousedown", (e) => {
-        isDown = true;
-        startX = e.pageX - listaMissoes.offsetLeft;
-        scrollLeft = listaMissoes.scrollLeft;
-      });
-      listaMissoes.addEventListener("mouseleave", () => (isDown = false));
-      listaMissoes.addEventListener("mouseup", () => (isDown = false));
-      listaMissoes.addEventListener("mousemove", (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const x = e.pageX - listaMissoes.offsetLeft;
-        const walk = (x - startX) * 2;
-        listaMissoes.scrollLeft = scrollLeft - walk;
-      });
-      listaMissoes.addEventListener("touchstart", (e) => {
-        isDown = true;
-        startX = e.touches[0].pageX - listaMissoes.offsetLeft;
-        scrollLeft = listaMissoes.scrollLeft;
-      });
-      listaMissoes.addEventListener("touchend", () => (isDown = false));
-      listaMissoes.addEventListener("touchmove", (e) => {
-        if (!isDown) return;
-        const x = e.touches[0].pageX - listaMissoes.offsetLeft;
-        const walk = (x - startX) * 2;
-        listaMissoes.scrollLeft = scrollLeft - walk;
-      });
-
-      // === Zoom card central ===
-      function atualizarZoomCarrossel() {
-        const cards = document.querySelectorAll(".mission-card");
-        const center = listaMissoes.scrollLeft + listaMissoes.offsetWidth / 2;
-        cards.forEach((card) => {
-          const cardCenter = card.offsetLeft + card.offsetWidth / 2;
-          const diff = Math.abs(center - cardCenter);
-          const scale = Math.max(0.85, 1 - diff / 500);
-          card.style.transform = `scale(${scale})`;
-        });
-      }
-
-      listaMissoes.addEventListener("scroll", atualizarZoomCarrossel);
-      window.addEventListener("resize", atualizarZoomCarrossel);
     </script>
   </body>
 </html>
