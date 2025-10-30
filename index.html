@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
@@ -29,11 +28,9 @@
         --accent-light: #1a2a40;
         --shadow: 0 6px 20px rgba(255, 255, 255, 0.05);
       }
-
       * {
         box-sizing: border-box;
       }
-
       body {
         margin: 0;
         font-family: "Inter", sans-serif;
@@ -46,7 +43,6 @@
         padding: 16px;
         transition: background 0.3s, color 0.3s;
       }
-
       h1 {
         font-size: 1.6rem;
         text-align: center;
@@ -56,7 +52,6 @@
         justify-content: center;
         gap: 10px;
       }
-
       .dark-toggle {
         top: 15px;
         right: 15px;
@@ -72,7 +67,6 @@
         align-items: center;
         gap: 5px;
       }
-
       .card {
         background: var(--card);
         border-radius: 18px;
@@ -83,7 +77,6 @@
         margin-bottom: 20px;
         position: relative;
       }
-
       input,
       select {
         width: 100%;
@@ -95,7 +88,6 @@
         color: var(--text);
         font-size: 1rem;
       }
-
       button {
         width: 100%;
         margin-top: 15px;
@@ -112,16 +104,13 @@
         align-items: center;
         gap: 8px;
       }
-
       button:hover {
         opacity: 0.9;
       }
-
       .carrossel-container {
         position: relative;
         overflow: hidden;
       }
-
       .carrossel {
         display: flex;
         overflow-x: auto;
@@ -130,11 +119,9 @@
         padding-bottom: 10px;
         scroll-behavior: smooth;
       }
-
       .carrossel::-webkit-scrollbar {
         display: none;
       }
-
       .mission-card {
         scroll-snap-align: center;
         min-width: 280px;
@@ -147,12 +134,10 @@
         flex-direction: column;
         align-items: center;
       }
-
       .mission-card.completed {
         background: linear-gradient(135deg, #ff6b6b, #ff2e63);
         color: #fff;
       }
-
       .mission-card button {
         width: auto;
         background: var(--accent);
@@ -161,12 +146,10 @@
         font-size: 0.9rem;
         margin-top: 10px;
       }
-
       .mission-card.completed button {
         background: #fff;
         color: #ff2e63;
       }
-
       .carrossel-nav {
         position: absolute;
         top: 50%;
@@ -182,15 +165,12 @@
         cursor: pointer;
         z-index: 5;
       }
-
       .carrossel-nav.left {
         left: -10px;
       }
-
       .carrossel-nav.right {
         right: -10px;
       }
-
       .progress-bar {
         background: #ccc;
         border-radius: 10px;
@@ -199,19 +179,16 @@
         margin-bottom: 8px;
         overflow: hidden;
       }
-
       .progress-fill {
         background: var(--accent);
         height: 100%;
         width: 0%;
         transition: width 0.5s ease;
       }
-
       canvas {
         width: 100% !important;
         max-height: 300px;
       }
-
       @media (min-width: 768px) {
         .mission-card {
           min-width: 320px;
@@ -219,7 +196,6 @@
       }
     </style>
   </head>
-
   <body>
     <button class="dark-toggle" id="toggleDark">
       <i data-lucide="moon"></i> Dark Mode
@@ -290,6 +266,7 @@
 
       let missoes = [];
       let totalGanho = 0;
+      let totalKm = 0;
       let chart;
 
       // === DARK MODE ===
@@ -336,16 +313,29 @@
         const tipo = tipoVariedade.value;
         if (!meta || !valorKm || meta <= 0 || valorKm <= 0)
           return alert("Valores inválidos!");
+
         missoes = [];
         let soma = 0;
         const minKm = tipo === "suave" ? 3 : 2;
         const maxKm = tipo === "suave" ? 10 : 20;
-        while (soma < meta && missoes.length < 100) {
+
+        // Garante pelo menos 5 missões, respeitando a meta
+        for (let i = 0; i < 100 && soma < meta * 1.05; i++) {
           const km = +(Math.random() * (maxKm - minKm) + minKm).toFixed(1);
           const valor = +(km * valorKm).toFixed(2);
-          missoes.push({ km, valor, done: false });
           soma += valor;
+          missoes.push({ km, valor, done: false });
+          if (soma >= meta) break;
         }
+
+        if (missoes.length === 0) {
+          for (let i = 0; i < 5; i++) {
+            const km = +(Math.random() * (maxKm - minKm) + minKm).toFixed(1);
+            const valor = +(km * valorKm).toFixed(2);
+            missoes.push({ km, valor, done: false });
+          }
+        }
+
         salvar();
         renderMissoes();
         atualizarResumo();
@@ -364,16 +354,21 @@
       // === RENDERIZAÇÃO ===
       function renderMissoes() {
         listaMissoes.innerHTML = "";
+        if (missoes.length === 0) {
+          listaMissoes.innerHTML =
+            "<p style='text-align:center;opacity:0.7;'>Nenhuma missão gerada.</p>";
+          return;
+        }
         missoes.forEach((m, i) => {
           const div = document.createElement("div");
           div.className = "mission-card" + (m.done ? " completed" : "");
           div.innerHTML = `
-            <div><i data-lucide="route"></i> ${m.km} km</div>
-            <div><i data-lucide="wallet"></i> R$ ${m.valor.toFixed(2)}</div>
-            <button><i data-lucide="${m.done ? "rotate-ccw" : "check"}"></i> ${
+        <div><i data-lucide="route"></i> ${m.km} km</div>
+        <div><i data-lucide="wallet"></i> R$ ${m.valor.toFixed(2)}</div>
+        <button><i data-lucide="${m.done ? "rotate-ccw" : "check"}"></i> ${
             m.done ? "Desfazer" : "Concluir"
           }</button>
-          `;
+      `;
           div
             .querySelector("button")
             .addEventListener("click", () => toggleMissao(i));
@@ -401,10 +396,27 @@
         totalGanho = missoes
           .filter((m) => m.done)
           .reduce((a, b) => a + b.valor, 0);
+        totalKm = missoes.filter((m) => m.done).reduce((a, b) => a + b.km, 0);
         const meta = parseFloat(metaInput.value) || 0;
-        resumoTexto.textContent = meta
-          ? `Total ganho: R$ ${totalGanho.toFixed(2)} de R$ ${meta}`
-          : "Nenhuma missão concluída ainda.";
+
+        // === NOVO CONTADOR GLOBAL ===
+        const ganhosGlobais = document.getElementById("ganhosGlobais");
+        if (ganhosGlobais) {
+          ganhosGlobais.innerHTML = `
+        <b>💰 R$ ${totalGanho.toFixed(2)}</b> ganhos • 
+        <b>📏 ${totalKm.toFixed(1)} km</b> percorridos
+      `;
+        }
+
+        if (meta > 0) {
+          resumoTexto.textContent = `Total ganho: R$ ${totalGanho.toFixed(
+            2
+          )} de R$ ${meta.toFixed(2)} • Distância percorrida: ${totalKm.toFixed(
+            1
+          )} km`;
+        } else {
+          resumoTexto.textContent = "Nenhuma missão concluída ainda.";
+        }
         atualizarProgress(meta);
         atualizarGrafico(meta);
       }
@@ -429,14 +441,19 @@
         const valores = [totalGanho, Math.max(0, meta - totalGanho)];
         if (!chart) {
           chart = new Chart(ctx, {
-            type: "doughnut",
+            type: "pie",
             data: {
               labels: ["Concluído", "Restante"],
               datasets: [
-                { data: valores, backgroundColor: ["#4da3ff", "#ccc"] },
+                {
+                  data: valores,
+                  backgroundColor: ["#4da3ff", "#ccc"],
+                },
               ],
             },
-            options: { plugins: { legend: { position: "bottom" } } },
+            options: {
+              plugins: { legend: { position: "bottom" } },
+            },
           });
         } else {
           chart.data.datasets[0].data = valores;
@@ -455,6 +472,17 @@
           })
         );
       }
+
+      // === ADICIONA O CONTADOR GLOBAL NA SEÇÃO DE MISSÕES ===
+      const secaoMissoes = document.querySelector(".card:nth-of-type(2) h2");
+      const contadorExtra = document.createElement("div");
+      contadorExtra.id = "ganhosGlobais";
+      contadorExtra.style.textAlign = "center";
+      contadorExtra.style.marginBottom = "10px";
+      contadorExtra.style.fontWeight = "600";
+      contadorExtra.style.fontSize = "0.95rem";
+      contadorExtra.textContent = "💰 R$ 0,00 ganhos • 📏 0,0 km percorridos";
+      secaoMissoes.insertAdjacentElement("afterend", contadorExtra);
 
       // === CARROSSEL NAVEGAÇÃO ===
       prevBtn.addEventListener("click", () => {
