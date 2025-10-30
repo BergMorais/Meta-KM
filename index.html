@@ -113,11 +113,13 @@
       }
       .carrossel {
         display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
+        flex-direction: column; /* cards empilhados verticalmente */
+        overflow-y: auto; /* scroll vertical */
+        scroll-snap-type: y mandatory; /* snap vertical */
         gap: 10px;
-        padding-bottom: 10px;
+        max-height: 400px; /* ajuste o tamanho conforme necessário */
         scroll-behavior: smooth;
+        padding-right: 10px; /* para não cortar scroll */
       }
       .carrossel::-webkit-scrollbar {
         display: none;
@@ -483,14 +485,6 @@
       contadorExtra.style.fontSize = "0.95rem";
       contadorExtra.textContent = "💰 R$ 0,00 ganhos • 📏 0,0 km percorridos";
       secaoMissoes.insertAdjacentElement("afterend", contadorExtra);
-
-      // === CARROSSEL NAVEGAÇÃO ===
-      prevBtn.addEventListener("click", () => {
-        listaMissoes.scrollBy({ left: -300, behavior: "smooth" });
-      });
-      nextBtn.addEventListener("click", () => {
-        listaMissoes.scrollBy({ left: 300, behavior: "smooth" });
-      });
     </script>
   </body>
 </html>
